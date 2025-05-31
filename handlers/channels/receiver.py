@@ -40,10 +40,10 @@ async def enter_count(message: types.Message, state: FSMContext):
     try:
         count = int(message.text)
         if count > 20:
-            await message.answer("Iltimos, 20 dan kam raqam kiriting.")
+            await message.answer("❌ Iltimos, 20 dan kam raqam kiriting.")
             return
         await db.set_count(chat_id=message.chat.id, count=count)
-        await message.answer(f"{count} ta odamga yuboriladi.")
+        await message.answer(f"{count} ta odamga yuboriladi ✅")
         await safe_finish(state)
     except ValueError:
-        await message.answer("Xato kiritildi. Iltimos, raqam kiriting.")
+        await message.answer("❌ Xato kiritildi. Iltimos, raqam kiriting.")
