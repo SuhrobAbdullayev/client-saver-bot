@@ -43,8 +43,12 @@ class Database:
               CREATE TABLE IF NOT EXISTS admins (
                                                     id SERIAL PRIMARY KEY,
                                                     user_id BIGINT UNIQUE NOT NULL,
-                                                    tablename VARCHAR(255) NOT NULL
-                  ); \
+                                                    tablename VARCHAR(255) NOT NULL,
+                                                    channel_id BIGINT NOT NULL,
+                                                      message_id INT NOT NULL default 0,
+                                                      counts int not null default 20,
+                                                      status boolean not null default false
+                  );
               """
         await self.execute(sql, execute=True)
 
@@ -59,8 +63,9 @@ class Database:
                                                     fullname varchar null,
                                                     positions varchar null,
                                                     workplace varchar null,
-                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-              ); \
+                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                    last_sent TIMESTAMP
+              );
               """
         await self.execute(sql, execute=True)
 
@@ -74,7 +79,8 @@ class Database:
                                                          fullname varchar null,
                                                          positions varchar null,
                                                          workplace varchar null,
-                                                         saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                         saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                         last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -89,7 +95,8 @@ class Database:
                                                     fullname varchar null,
                                                     positions varchar null,
                                                     workplace varchar null,
-                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                    last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -104,7 +111,8 @@ class Database:
                                                        fullname varchar null,
                                                        positions varchar null,
                                                        workplace varchar null,
-                                                       saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                       saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                       last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -119,7 +127,8 @@ class Database:
                                                      fullname varchar null,
                                                      positions varchar null,
                                                      workplace varchar null,
-                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                     last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -134,7 +143,8 @@ class Database:
                                                     fullname varchar null,
                                                     positions varchar null,
                                                     workplace varchar null,
-                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                    last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -149,8 +159,21 @@ class Database:
                                                     fullname varchar null,
                                                     positions varchar null,
                                                     workplace varchar null,
-                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                    last_sent TIMESTAMP
               ); \
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_sendings(self):
+        sql = """
+                CREATE TABLE IF NOT EXISTS send_message (
+                                                    id SERIAL PRIMARY KEY,
+                                                    tablename varchar(255) NOT NULL,
+                                                    message_id INTEGER,
+                                                    count INTEGER NOT NULL DEFAULT 20,
+                                                    status BOOLEAN NOT NULL DEFAULT FALSE
+              ); 
               """
         await self.execute(sql, execute=True)
 
@@ -165,6 +188,11 @@ class Database:
 
     async def get_info(self, user_id):
         sql = f"SELECT * FROM admins WHERE user_id = '{user_id}'"
+        return await self.execute(sql, fetchrow=True)
+
+
+    async def get_channel_info(self, channel_id):
+        sql = f"SELECT * FROM admins WHERE channel_id = '{channel_id}'"
         return await self.execute(sql, fetchrow=True)
 
     async def add_full_client(self, user_id, username, phone, fullname, position, workplace, table_name):
@@ -183,6 +211,13 @@ class Database:
         result = await self.execute(sql, user_id, fetchrow=True)
         return result is not None
 
+    async def update_message_id(self, chat_id, mid):
+        sql = f"UPDATE admins SET message_id = {mid} WHERE user_id='{chat_id}'"
+        return await self.execute(sql, fetch=True)
+
+    async def set_count(self, chat_id, count):
+        sql = f"UPDATE admins SET counts='{count}', status = true WHERE user_id='{chat_id}'"
+        return await self.execute(sql, fetch=True)
 
     async def export_to_excel(self, table_name: str, filename: str) -> bool:
         sql = f"""
@@ -200,4 +235,3 @@ class Database:
         ])
         df.to_excel(filename, index=False)
         return True
-

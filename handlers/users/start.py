@@ -29,7 +29,7 @@ def normalize_phone(text: str) -> str or None:
     if digits.startswith('998') and len(digits) == 12:
         return '+{}'.format(digits)
 
-    elif len(digits) == 9 and digits.startswith(('90', '91', '93', '94', '95', '97', '98', '99', '88', '33')):
+    elif len(digits) == 9:
         return '+998{}'.format(digits)
 
     else:
