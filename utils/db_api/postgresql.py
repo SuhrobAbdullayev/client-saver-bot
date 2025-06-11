@@ -44,7 +44,7 @@ class Database:
                                                     id SERIAL PRIMARY KEY,
                                                     user_id BIGINT UNIQUE NOT NULL,
                                                     tablename VARCHAR(255) NOT NULL,
-                                                    channel_id BIGINT NOT NULL,
+                                                      channel_id BIGINT NOT NULL,
                                                       message_id INT NOT NULL default 0,
                                                       counts int not null default 20,
                                                       status boolean not null default false
@@ -64,6 +64,19 @@ class Database:
                                                     positions varchar null,
                                                     workplace varchar null,
                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                    last_sent TIMESTAMP,
+                                                    sent boolean DEFAULT false,
+                                                    reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_xorazm2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS xorazm_users (
+                                                    id SERIAL PRIMARY KEY,
+                                                    user_id BIGINT UNIQUE NOT NULL,
+                                                    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                                     last_sent TIMESTAMP
               );
               """
@@ -80,7 +93,20 @@ class Database:
                                                          positions varchar null,
                                                          workplace varchar null,
                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                         last_sent TIMESTAMP
+                                                         last_sent TIMESTAMP,
+                                                         sent boolean DEFAULT false,
+                                                         reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_qashqadaryo2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS qashqadaryo_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -96,7 +122,20 @@ class Database:
                                                     positions varchar null,
                                                     workplace varchar null,
                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                    last_sent TIMESTAMP
+                                                    last_sent TIMESTAMP,
+                                                    sent boolean DEFAULT false,
+                                                    reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_navoiy2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS navoiy_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -112,7 +151,20 @@ class Database:
                                                        positions varchar null,
                                                        workplace varchar null,
                                                        saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                       last_sent TIMESTAMP
+                                                       last_sent TIMESTAMP,
+                                                       sent boolean DEFAULT false,
+                                                       reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_samarqand2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS samarqand_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -128,7 +180,20 @@ class Database:
                                                      positions varchar null,
                                                      workplace varchar null,
                                                      saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                     last_sent TIMESTAMP
+                                                     last_sent TIMESTAMP,
+                                                     sent boolean DEFAULT false,
+                                                     reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_fargona2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS fargona_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -144,7 +209,20 @@ class Database:
                                                     positions varchar null,
                                                     workplace varchar null,
                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                    last_sent TIMESTAMP
+                                                    last_sent TIMESTAMP,
+                                                    sent boolean DEFAULT false,
+                                                    reminder_count INTEGER DEFAULT 0
+              );
+              """
+        await self.execute(sql, execute=True)
+
+    async def create_table_jizzax2(self):
+        sql = """
+              CREATE TABLE IF NOT EXISTS jizzax_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
               );
               """
         await self.execute(sql, execute=True)
@@ -160,20 +238,21 @@ class Database:
                                                     positions varchar null,
                                                     workplace varchar null,
                                                     saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                    last_sent TIMESTAMP
+                                                    last_sent TIMESTAMP,
+                                                    sent boolean DEFAULT false,
+                                                    reminder_count INTEGER DEFAULT 0
               ); \
               """
         await self.execute(sql, execute=True)
 
-    async def create_table_sendings(self):
+    async def create_table_buxoro2(self):
         sql = """
-                CREATE TABLE IF NOT EXISTS send_message (
-                                                    id SERIAL PRIMARY KEY,
-                                                    tablename varchar(255) NOT NULL,
-                                                    message_id INTEGER,
-                                                    count INTEGER NOT NULL DEFAULT 20,
-                                                    status BOOLEAN NOT NULL DEFAULT FALSE
-              ); 
+              CREATE TABLE IF NOT EXISTS buxoro_users (
+                                                          id SERIAL PRIMARY KEY,
+                                                          user_id BIGINT UNIQUE NOT NULL,
+                                                          saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                          last_sent TIMESTAMP
+              );
               """
         await self.execute(sql, execute=True)
 
@@ -204,11 +283,15 @@ class Database:
         """
         return await self.execute(sql, user_id, username, phone, fullname, position, workplace, fetchrow=True)
 
-
-
     async def client_exists(self, user_id: int, table_name: str) -> bool:
         sql = f"SELECT 1 FROM {table_name} WHERE user_id = $1 LIMIT 1"
         result = await self.execute(sql, user_id, fetchrow=True)
+        return result is not None
+
+
+    async def sent_false_clients(self, table_name: str) -> bool:
+        sql = f"SELECT * FROM {table_name} WHERE sent = false"
+        result = await self.execute(sql,  fetchrow=True)
         return result is not None
 
     async def update_message_id(self, chat_id, mid):

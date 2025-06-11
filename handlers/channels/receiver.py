@@ -25,7 +25,14 @@ async def handle_channel_post(message: types.Message):
     if channel_data is None:
         return
 
+    isClient = await db.sent_false_clients(channel_data['tablename'])
     admin_id = channel_data['user_id']
+    if not isClient:
+        await bot.send_message(
+            chat_id=admin_id,
+            text="Hamma odamlarga yuborilgan ✅"
+        )
+        return
     await db.update_message_id(chat_id=admin_id, mid=message.message_id)
     state = dp.current_state(chat=admin_id, user=admin_id)
     await state.set_state(MessageSending.count.state)
